@@ -3,6 +3,10 @@
 #include <string.h>
 #include <math.h>
 
+#define MAX(a,b) ((a) > (b) ? (a) : (b))
+#define MIN(a,b) ((a) < (b) ? (a) : (b))
+// c stdlib doesn't have min/max functions so i use macros to define them
+
 int find_p1(char* grid, int size, int index){
     // function to check xmas for a single char; size should be the length of 1 dimension
     // assume the char being checked is x
@@ -86,6 +90,30 @@ int find_p1(char* grid, int size, int index){
 
     return total;
 }
+
+int find_p2(char* grid, int size, int index){
+    // assume that index being checked is A
+    int x = index / size, y = index % size;
+    if(x <= 0 || y <= 0 || x >= size || y >= size){ // on an edge of the grid - always false
+        return 0;
+    }
+
+    int tl_dr = 0, tr_dl = 0; // topleft/downright, topright/downleft diags
+
+    // topleft/downright diag has correct chars
+    if((grid[size * x + y - (size + 1)] == 'M' && grid[size * x + y + (size + 1)] == 'S') ||
+            (grid[size * x + y - (size + 1)] == 'S' && grid[size * x + y + (size + 1)] == 'M')){
+        tl_dr = 1;
+    }
+
+    // topright/downleft diag has correct chars
+    if((grid[size * x + y - (size - 1)] == 'M' && grid[size * x + y + (size - 1)] == 'S') ||
+       (grid[size * x + y - (size - 1)] == 'S' && grid[size * x + y + (size - 1)] == 'M')){
+        tr_dl = 1;
+    }
+
+    return MIN(tl_dr, tr_dl); // 1 if both are 1, 0 otherwise
+}
 int main(){
     int input_size = 140; // 6 for example_small, 10 for example, 140 for input
     char* grid = calloc(input_size * input_size, sizeof(char));
@@ -104,6 +132,10 @@ int main(){
         if(grid[i] == 'X'){
             total_p1 += find_p1(grid, input_size, i);
         }
+        if(grid[i] == 'A'){
+            total_p2 += find_p2(grid, input_size, i);
+        }
     }
-    printf("%d", total_p1);
+    printf("%d\n", total_p1);
+    printf("%d", total_p2);
 }
