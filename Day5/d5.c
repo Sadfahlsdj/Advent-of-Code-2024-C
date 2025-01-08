@@ -13,10 +13,16 @@ int contains(int array[], int size, int element){
     return 0;
 }
 
+void swap(int array[], int idx1, int idx2){
+    int tmp = array[idx1];
+    array[idx1] = array[idx2];
+    array[idx2] = tmp;
+}
+
 int main(){
     char line[256];
     FILE* file = fopen("input.txt", "r");
-    int hash[100][100] = {0}, hash_indices[100] = {0}, total_p1 = 0;
+    int hash[100][100] = {0}, hash_indices[100] = {0}, total_p1 = 0, total_p2 = 0;
     // int hash_indices[100] = {0};
 
     while (fgets(line, sizeof(line), file)){
@@ -36,7 +42,7 @@ int main(){
             char* nums_raw = strtok(line_cpy, ",");
             int valid_p1 = 1, count = 0; // count is # of numbers in current line
 
-            // see how many numbers in current line
+            // see how many numbers in current line; doing a 2nd pass later to grab values
             while(nums_raw != NULL){
                 count++;
                 nums_raw = strtok(NULL, ",");
@@ -63,14 +69,30 @@ int main(){
 
             if(valid_p1){
                 // printf("%d\n", nums[(idx) / 2]); // halfway point
-                total_p1 += nums[(idx) / 2];
+                total_p1 += nums[idx / 2];
             }
 
+            // p2
+            if(!valid_p1) {
+                while (1) { // inf loop until no more changes are needed
+                    int changed = 0;
+                    for (int i = 0; i < (idx - 1); i++) {
+                        if (!contains(hash[nums[i]], 100, nums[i + 1])) {
+                            swap(nums, i, i + 1);
+                            changed = 1;
+                        }
+                    }
+                    if(!changed){
+                        break; // break if no changes
+                    }
+                }
+                total_p2 += nums[idx / 2];
+            }
         }
-        else{
+        else{ // triggers on the blank line in input, just skips it
             continue;
         }
     }
-    printf("%d\n", total_p1);
-
+    printf("p1: %d\n", total_p1);
+    printf("p2: %d\n", total_p2);
 }
