@@ -8,52 +8,55 @@ typedef struct Coord {
     int y;
 } coord;
 
-int hash(coord pos, coord dir){
-    return (pos.x << 7) + (pos.y) + (dir.x << 8) + (dir.y << 9); // this shit so ass </3
-}
+//int hash(coord pos, coord dir, int size){
+//    return ((dir.x + 1) + (dir.y + 1) * 3) * (pos.x + pos.y * size); // this shit so ass 💔
+//}
 
-int loop(int** grid, coord start, int curr_line){
-    printf("started");
-    int visited[65536] = {0};
+int loop(int grid[10][10], coord start, int curr_line, int obs_x, int obs_y){ // hardcode grid size
+    // obs_x & obs_y are diagnostic
+    // int visited[70000] = {0};
+    int visited[10][10][3][3] = {0};
     coord current = {start.x, start.y};
     coord dir = {-1, 0};
 
-    while(current.x >= 0 && current.x < curr_line && current.y >= 0 && current.y < curr_line){
-        if (visited[hash(current, dir)]){ // if visited same pair of (direction, coord)
-            return 0;
+    while(current.x >= 0 && current.x < curr_line && current.y >= 0 && current.y < curr_line) {
+        // int h = hash(current, dir, curr_line);
+//        printf("hashing %d, %d and %d, %d gives %d\n", current.x, current.y,
+//               dir.x, dir.y, h);
+//        printf("currently at %d, %d facing %d, %d, val = %d\n", current.x, current.y, dir.x, dir.y,
+//               visited[current.x][current.y][dir.x + 1][dir.y + 1]);
+        if (visited[current.x][current.y][dir.x + 1][dir.y + 1]) {
+            // if visited same pair of (direction, coord)
+            printf("obstacle at %d, %d successfully blocked\n", obs_x, obs_y);
+            return 1;
         }
-        visited[hash(current, dir)] = 1;
+        visited[current.x][current.y][dir.x + 1][dir.y + 1] = 1;
 
         grid[current.x][current.y] = 2; // stores visited values; identical to 0
         coord next = {current.x + dir.x, current.y + dir.y};
 
-        if(grid[next.x][next.y] == 0 || grid[next.x][next.y] == 2){
+        if (grid[next.x][next.y] == 0 || grid[next.x][next.y] == 2) {
             current.x = next.x, current.y = next.y;
-        }
-        else{ // going to do dir switching in a really shit way out of principle(?)
-            if(dir.x == -1 && dir.y == 0){
+        } else { // going to do dir switching in a really shit way out of principle(?)
+            if (dir.x == -1 && dir.y == 0) {
                 dir.x = 0, dir.y = 1;
-            }
-            else if(dir.x == 0 && dir.y == 1){
+            } else if (dir.x == 0 && dir.y == 1) {
                 dir.x = 1, dir.y = 0;
-            }
-            else if(dir.x == 1 && dir.y == 0){
+            } else if (dir.x == 1 && dir.y == 0) {
                 dir.x = 0, dir.y = -1;
-            }
-            else{
+            } else {
                 dir.x = -1, dir.y = 0;
             }
         }
-
     }
-    return 1;
+    return 0;
 }
 
 int main(){
-    char line[132] = {'\0'}; // 12 for example, 132 for input
-    int grid[130][130] = {0}; // line length - 2; 0=open, 1=obstacle, 2=open & visited
+    char line[12] = {'\0'}; // 12 for example, 132 for input
+    int grid[10][10] = {0}; // line length - 2; 0=open, 1=obstacle, 2=open & visited
     coord start = {0, 0};
-    FILE* file = fopen("input.txt", "r");
+    FILE* file = fopen("example.txt", "r");
 
     int curr_line = 0;
     while (fgets(line, sizeof(line), file)){
@@ -113,20 +116,29 @@ int main(){
             }
         }
     }
-
-    printf("%d", loop((int**) grid, current_2, curr_line));
-//    for(int i = 0; i < curr_line; i++) {
-//        for (int j = 0; j < curr_line; j++) {
-//            if(i != current_2.x && j != current_2.y){
-//                int temp = grid[i][j];
-//                grid[i][j] = 1;
-//                total_p2 += loop((int**) grid, current_2, curr_line);
-//                grid[i][j] = temp;
-//            }
-//        }
-//    }
     printf("total p1: %d\n", total_p1);
-    printf("total p2: %d", total_p2);
+
+    coord curr_keep = {current_2.x, current_2.y};
+//    int i = 6, j = 3;
+//    int temp = grid[i][j];
+//    grid[i][j] = 1;
+//    total_p2 += loop(grid, current_2, curr_line, i, j);
+//    grid[i][j] = temp;
+
+    for(int i = 0; i < curr_line; i++) {
+        for (int j = 0; j < curr_line; j++) {
+            printf("changing %d, %d, start pos is %d, %d\n", i, j, current_2.x, current_2.y);
+            if(i != current_2.x && j != current_2.y && grid[i][j] != 1){
+                current_2.x = curr_keep.x, current_2.y = curr_keep.y;
+                int temp = grid[i][j];
+                grid[i][j] = 1;
+                total_p2 += loop(grid, current_2, curr_line, i, j);
+                grid[i][j] = temp;
+            }
+        }
+    }
+
+    printf("total p2: %d\n", total_p2);
 
 //    for(int i = 0; i < curr_line; i++){
 //        for(int j = 0; j < 10; j++){
