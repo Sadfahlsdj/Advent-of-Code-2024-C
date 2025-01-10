@@ -12,7 +12,7 @@ typedef struct Coord {
 //    return ((dir.x + 1) + (dir.y + 1) * 3) * (pos.x + pos.y * size); // this shit so ass 💔
 //}
 
-void print_board(int grid[130][130], int curr_line){
+void print_board(int grid[160][160], int curr_line){
     for(int i = 0; i < curr_line; i++){
         for(int j = 0; j < 10; j++){
             printf("%d", grid[i][j]);
@@ -21,21 +21,18 @@ void print_board(int grid[130][130], int curr_line){
     }
 }
 
-int loop(int grid[130][130], coord start, int curr_line, int obs_x, int obs_y){ // hardcode grid size
+int loop(int grid[160][160], coord start, int curr_line, int obs_x, int obs_y){ // hardcode grid size
     // obs_x & obs_y are diagnostic
     // int visited[70000] = {0};
-    int visited[130][130][3][3] = {0};
+    int visited[160][160][3][3] = {0};
     coord current = {start.x, start.y};
     coord dir = {-1, 0};
 
     while(current.x >= 0 && current.x < curr_line && current.y >= 0 && current.y < curr_line) {
-        // int h = hash(current, dir, curr_line);
-//        printf("hashing %d, %d and %d, %d gives %d\n", current.x, current.y,
-//               dir.x, dir.y, h);
 //        printf("currently at %d, %d facing %d, %d, val = %d\n", current.x, current.y, dir.x, dir.y,
 //               visited[current.x][current.y][dir.x + 1][dir.y + 1]);
         if (visited[current.x][current.y][dir.x + 1][dir.y + 1]) {
-            // if visited same pair of (direction, coord)
+            // if visited same (x, y, dirx, diry)
             // printf("obstacle at %d, %d successfully blocked\n", obs_x, obs_y);
             return 1;
         }
@@ -62,8 +59,8 @@ int loop(int grid[130][130], coord start, int curr_line, int obs_x, int obs_y){ 
 }
 
 int main(){
-    char line[132] = {'\0'}; // 12 for example, 132 for input
-    int grid[130][130] = {0}; // line length - 2; 0=open, 1=obstacle, 2=open & visited
+    char line[160] = {'\0'}; // 12 for example, 160 for input
+    int grid[160][160] = {0}; // line length - 2; 0=open, 1=obstacle, 2=open & visited
     coord start = {0, 0};
     FILE* file = fopen("input.txt", "r");
 
