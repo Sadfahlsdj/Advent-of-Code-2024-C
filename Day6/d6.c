@@ -1,3 +1,7 @@
+// issue is running OOM on the stack due to clang having 8mb of stack memory by default
+// caused by the atrocity of a "hashing" system that i used
+// let this be a lesson
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
