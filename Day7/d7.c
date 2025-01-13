@@ -13,17 +13,20 @@ double time_now() { // used for timing
 }
 
 long concat(long x, long y){ // used for p2
-    char str1[256], str2[256];
-    sprintf(str1, "%lu", x);
-    sprintf(str2, "%lu", y);
-    char* ret = strcat(str1, str2);
-    return(strtol(ret, NULL, 10));
+    // leaving old code here for improvement; strcat is INSANELY slow, so using what is
+    // currently being used slashes runtime in nearly 10
+//    char str1[256], str2[256];
+//    sprintf(str1, "%lu", x);
+//    sprintf(str2, "%lu", y);
+//    char* ret = strcat(str1, str2);
+//    return(strtol(ret, NULL, 10));
+    return x * (10 > y ? 10 : 100 > y ? 100 : 1000) + y;
 }
 
 long* next_list(long* inp, int len, int next, long total, int problem){
     // inp - current numbers, len - len of inp, next - next number, total - total val to check for
     // problem = 0 for p1, 1 for p2
-    long* out = calloc(len * 2, sizeof(int));
+    long* out = calloc(len * (2 + problem), sizeof(int));
 
     int index = 0;
     for(int i = 0; i < len; i++){
